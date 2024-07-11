@@ -37,6 +37,10 @@ router.get("/",wrapAsync(async(req,res)=>{
    router.get("/:id",wrapAsync(async(req,res)=>{
       let {id}=req.params;
      const listing= await Listing.findById(id).populate("reviews");
+     if(!listing){
+        req.flash("error","Listing you requested that does not exit");
+        res.redirect("/listings");
+     }
      res.render("listings/show.ejs",{listing});
    }));
    
@@ -51,7 +55,12 @@ router.get("/",wrapAsync(async(req,res)=>{
    //edit route
    router.get("/:id/edit",wrapAsync(async(req,res)=>{
        let {id}=req.params;
-       const listing= await Listing.findById(id);
+       let newListing=req.body.listing;
+       await Listing.findByIdAndUpdate(id,newListing);
+       if(!listing){
+        req.flash("error","Listing you requested that does not exit");
+        res.redirect(`/listings/${id}`);
+     }
        res.render("listings/edit.ejs",{listing});
    }));
    
